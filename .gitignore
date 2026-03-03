@@ -1,0 +1,15 @@
+# Ignore build output folder
+bin/
+
+# Ignore object files
+*.o
+*.obj
+
+# Ignore executable files
+*.exe
+*.out
+*.app
+
+# Ignore temporary files
+*.tmp
+*.log
