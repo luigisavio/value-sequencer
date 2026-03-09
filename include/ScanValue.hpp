@@ -4,7 +4,7 @@
 #include <vector>
 #include <algorithm>
 
-namespace Sequence
+namespace sequence
 {
 	// Generates a value that changes based on how many times a particular function is called.
 	template <typename T> // T represents the type of the value to be changed.
@@ -49,7 +49,7 @@ namespace Sequence
 		}
 
 		// Checks if sequence is running
-		bool isSequenceRunning() const noexcept { return m_currentStepIndex != noStepIdx; }
+		bool isSequenceRunning() const noexcept { return (m_currentStepIndex != noStepIdx) || m_startSequenceRequest; }
 
 	private:
 		std::vector<StepPar> m_sequenceDef{}; // Values of the number and times during the sequence
@@ -110,10 +110,11 @@ namespace Sequence
 				++m_numOfScansAlreadyDone;
 				// Check required number of scans have already happened
 				if (m_numOfScansAlreadyDone >= m_sequenceDef[static_cast<std::size_t>(m_currentStepIndex)].numberOfScans)
+				{
 					switchToNextStep();
+				}
 			}
 		}
-
 		return getValue();
 	}
 
@@ -123,7 +124,7 @@ namespace Sequence
 		reset();
 		m_sequenceDef = std::vector<StepPar>(sequenceDef); // Potentially expensive copy
 		m_idleValue = idleValue;
-		m_numberOfSteps = m_sequenceDef.size(); // Get number of steps to be executed from size of steps vector
+		m_numberOfSteps = static_cast<int>(m_sequenceDef.size()); // Get number of steps to be executed from size of steps vector
 		return (m_numberOfSteps > 0);
 	}
 
@@ -144,6 +145,6 @@ namespace Sequence
 		return *this;
 	}
 
-} // namespace Sequence
+} // namespace sequence
 
 #endif // SCAN_VALUE_HPP
