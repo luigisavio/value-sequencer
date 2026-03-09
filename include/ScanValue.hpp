@@ -55,8 +55,8 @@ namespace Sequence
 		std::vector<StepPar> m_sequenceDef{}; // Values of the number and times during the sequence
 		T m_idleValue{};
 		int m_currentStepIndex{noStepIdx}; // Current index of the step
-		long m_numOfScansAlreadyDone{0};	// Number of scans that have already been executed
-		int m_numberOfSteps{0};				// Total number of steps to be executed
+		long m_numOfScansAlreadyDone{0};   // Number of scans that have already been executed
+		int m_numberOfSteps{0};			   // Total number of steps to be executed
 		bool m_startSequenceRequest{false};
 
 		// Switches to the step. Returns true if it was possible and false if the sequence is finished
@@ -68,10 +68,9 @@ namespace Sequence
 	const T &ScanValue<T>::getValue() const noexcept
 	{
 		return (m_currentStepIndex == noStepIdx) ? m_idleValue
-												  : m_sequenceDef[static_cast<std::size_t>(m_currentStepIndex)].value;
+												 : m_sequenceDef[static_cast<std::size_t>(m_currentStepIndex)].value;
 	}
 
-	
 	template <typename T>
 	bool ScanValue<T>::switchToNextStep() noexcept
 	{
@@ -79,9 +78,10 @@ namespace Sequence
 		m_numOfScansAlreadyDone = 0;
 
 		auto begin = m_sequenceDef.begin() + static_cast<std::size_t>(m_currentStepIndex + 1); // Start searching from next element
-		auto end   = m_sequenceDef.begin() + static_cast<std::size_t>(m_numberOfSteps); // One after the end
+		auto end = m_sequenceDef.begin() + static_cast<std::size_t>(m_numberOfSteps);		   // One after the end
 
-		auto it = std::find_if(begin, end, [] (const ScanValue<T>::StepPar &step) {return step.numberOfScans > 0;}); // Look for a step that has at least one scan
+		auto it = std::find_if(begin, end, [](const ScanValue<T>::StepPar &step)
+							   { return step.numberOfScans > 0; }); // Look for a step that has at least one scan
 
 		if (it == end)
 		{
@@ -92,7 +92,6 @@ namespace Sequence
 		m_currentStepIndex = static_cast<int>(std::distance(m_sequenceDef.begin(), it));
 		return true;
 	}
-
 
 	template <typename T>
 	const T &ScanValue<T>::executeSequence() noexcept
