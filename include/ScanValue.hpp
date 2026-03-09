@@ -20,6 +20,9 @@ namespace sequence
 		};
 
 		// Generic constructor
+		// Passing the vector by value. If called on an lvalue a copy is made. Otherwise move constructor is called.
+		// In both cases, the vector inside this function can be cleared by moving it to another vector for better 
+		// performances.
 		ScanValue(std::vector<StepPar> sequenceDef, const T &idleValue = {}) noexcept
 		{
 			setSequence(sequenceDef, idleValue);
@@ -28,9 +31,9 @@ namespace sequence
 		// Default constructor
 		ScanValue() noexcept {}
 
-		// Configure the sequence. If object was already doing something it is reset
-		bool setSequence(const std::vector<StepPar> &sequenceDef, const T &idleValue = {}) noexcept; // Safer
-		bool setSequence(std::vector<StepPar> &&sequenceDef, const T &idleValue = {}) noexcept;		 // More performant, avoids a copy of the array, use std::move to pass the array
+		// Configure the sequence. If object was already doing something it is reset.
+		// Pass vector by value: if it is an lvalue it will copied, otherwise moved.
+		bool setSequence(std::vector<StepPar> sequenceDef, const T &idleValue = {}) noexcept;
 
 		// Simply returns the value
 		const T &getValue() const noexcept;
@@ -119,22 +122,12 @@ namespace sequence
 	}
 
 	template <typename T>
-	bool ScanValue<T>::setSequence(const std::vector<StepPar> &sequenceDef, const T &idleValue) noexcept
+	bool ScanValue<T>::setSequence(std::vector<StepPar> sequenceDef,const T &idleValue) noexcept
 	{
 		reset();
-		m_sequenceDef = std::vector<StepPar>(sequenceDef); // Potentially expensive copy
+		m_sequenceDef = std::move(sequenceDef); // Avoid expensive copy by using move semantics on std vector (move assignment operator)
 		m_idleValue = idleValue;
 		m_numberOfSteps = static_cast<int>(m_sequenceDef.size()); // Get number of steps to be executed from size of steps vector
-		return (m_numberOfSteps > 0);
-	}
-
-	template <typename T>
-	bool ScanValue<T>::setSequence(std::vector<StepPar> &&sequenceDef, const T &idleValue) noexcept
-	{
-		reset();
-		m_sequenceDef = std::move(sequenceDef); // Avoid expensive copy
-		m_idleValue = idleValue;
-		m_numberOfSteps = m_sequenceDef.size(); // Get number of steps to be executed from size of steps vector
 		return (m_numberOfSteps > 0);
 	}
 
