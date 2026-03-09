@@ -33,7 +33,33 @@ void basicSequenceTest()
     std::cout << "Basic sequence test completed\n";
 }
 
+void moveHappensTest()
+{
+    std::cout << "Starting test that checks move happens\n";
+
+    using namespace sequence;
+
+    std::vector<ScanValue<int>::StepPar> seq {{{1, 0}, {2, 1}, {0, 3}, {3, 4}}};
+
+    assert(seq.size() != 0);
+
+    {
+        ScanValue<int> scanValue{seq}; // Move should not happen
+    }
+
+    assert(seq.size() != 0);
+
+    {
+        ScanValue<int> scanValue{std::move(seq)}; // Now move should happen
+    }
+
+    assert(seq.size() == 0); // Check that sequence is empty since it must have been moved to scanValue
+
+    std::cout << "Test check move happened completed\n";
+}
+
 int main()
 {
     basicSequenceTest();
+    moveHappensTest();
 }
