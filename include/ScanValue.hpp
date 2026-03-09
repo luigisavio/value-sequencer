@@ -25,7 +25,7 @@ namespace sequence
 		// performances.
 		ScanValue(std::vector<StepPar> sequenceDef, const T &idleValue = {}) noexcept
 		{
-			setSequence(sequenceDef, idleValue);
+			setSequence(std::move(sequenceDef), idleValue);
 		}
 
 		// Default constructor
