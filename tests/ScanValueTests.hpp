@@ -57,9 +57,3 @@ void moveHappensTest()
 
     std::cout << "Test check move happened completed\n";
 }
-
-int main()
-{
-    basicSequenceTest();
-    moveHappensTest();
-}
