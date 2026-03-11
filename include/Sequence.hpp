@@ -1,9 +1,9 @@
-#ifndef SCAN_VALUE_HPP
-#define SCAN_VALUE_HPP
+#ifndef SEQUENCE_HPP
+#define SEQUENCE_HPP
 
 #include <vector>
 
-namespace sequence
+namespace valueSequencer
 {
     // Abstract class to be used as parent to define a sequence
 	template <typename T, typename U> // T it the value to be changed, U defines for how much each value must be assigned
@@ -124,6 +124,6 @@ namespace sequence
 		return *this;
 	}
 
-} // namespace sequence
+} // namespace valueSequencer
 
 #endif // SCAN_VALUE_HPP
