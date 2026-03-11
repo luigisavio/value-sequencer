@@ -55,7 +55,7 @@ namespace valueSequencer
 
         virtual ~Sequence() = default;
 
-	private:
+	protected:
 		std::vector<Step> m_sequenceDef{}; // Values of the number and times during the sequence
 		T m_idleValue{};
 		int m_currentStepIndex{noStepIdx}; // Current index of the step
