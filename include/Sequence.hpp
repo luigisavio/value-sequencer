@@ -5,8 +5,16 @@
 
 namespace valueSequencer
 {
-    // Abstract class to be used as parent to define a sequence
-	template <typename T, typename U> // T it the value to be changed, U defines for how much each value must be assigned
+    /**
+	 * @brief Abstract class to create sequences of values.
+	 *
+	 * This class provides a base interface for generating sequences where
+	 * a value is assigned for a specified duration.
+	 *
+	 * @tparam T Type of value assigned during the sequence.
+	 * @tparam U Type used to represent how long each value is assigned.
+	 */
+	template <typename T, typename U>
 	class Sequence
 	{
 	public:
@@ -18,50 +26,108 @@ namespace valueSequencer
             U length{};
 		};
 
-		// Generic constructor
-		// Passing the vector by value. If called on an lvalue a copy is made. Otherwise move constructor is called.
-		// In both cases, the vector inside this function can be cleared by moving it to another vector for better 
-		// performances.
+		/**
+		 * @brief Generic constructor.
+		 *
+		 * The sequence definition vector is passed by value. If the constructor
+		 * is called with an lvalue, a copy is created; if called with an rvalue,
+		 * the move constructor is used.
+		 * In both cases, the vector inside this function can be moved into the
+		 * internal storage, allowing the original container to be cleared and
+		 * improving performance.
+		 *
+		 * @param sequenceDef Vector defining the sequence steps.
+		 * @param idleValue Value assigned when the sequence is idle (default constructed if not specified).
+		 */
 		Sequence(std::vector<Step> sequenceDef, const T &idleValue = {})
         {
 			setSequence(std::move(sequenceDef), idleValue);
 		}
 
-		// Default constructor
+		/**
+		 * @brief Default constructor.
+		 */
 		Sequence() {}
 
-		// Configure the sequence. If object was already doing something it is reset.
-		// Pass vector by value: if it is an lvalue it will copied, otherwise moved.
-		bool setSequence(std::vector<Step> sequenceDef, const T &idleValue = {});
+		/**
+		 * @brief Configures the sequence.
+		 *
+		 * If the object was already executing a sequence, it is reset before
+		 * applying the new configuration.
+		 * The sequence definition vector is passed by value: if an lvalue is
+		 * provided it will be copied, otherwise it will be moved.
+		 *
+		 * @param sequenceDef Vector defining the sequence steps.
+		 * @param idleValue Value assigned when the sequence is idle.
+		 * @return True if the sequence was configured successfully.
+		 */
+		bool setSequence(std::vector<Step> sequenceDef, const T& idleValue = {});
 
-		// Simply returns the value
-		const T &getValue() const;
+		/**
+		 * @brief Returns the current value of the sequence.
+		 *
+		 * @return Reference to the current value.
+		 */
+		const T& getValue() const;
 
-		// Updates time and returns the integral value after the update
-		const T &executeSequence();
+		/**
+		 * @brief Updates the sequence progress and returns the resulting value.
+		 *
+		 * This function advances the internal state of the sequence according
+		 * to the elapsed execution step and returns the updated value.
+		 *
+		 * @return Reference to the updated value.
+		 */
+		const T& executeSequence();
 
-		// Completely resets the object, equivalent to creating a new one with constructor method
-		Sequence &reset();
+		/**
+		 * @brief Resets the sequence state.
+		 *
+		 * Restores the object to the same state as after default construction.
+		 *
+		 * @return Reference to the current object.
+		 */
+		Sequence& reset();
 
-		// Triggers the start of the sequences
-		Sequence &start()
+		/**
+		 * @brief Requests the start of the sequence.
+		 *
+		 * The sequence will start on the next execution cycle.
+		 *
+		 * @return Reference to the current object.
+		 */
+		Sequence& start()
 		{
 			m_startSequenceRequest = true;
 			return *this;
 		}
 
-		// Checks if sequence is running
-		bool isSequenceRunning() const { return (m_currentStepIndex != noStepIdx) || m_startSequenceRequest; }
+		/**
+		 * @brief Checks whether the sequence is running or scheduled to start.
+		 *
+		 * The sequence is considered running if a step is currently active,
+		 * or if a start request has been issued but not yet processed.
+		 *
+		 * @return True if the sequence is running or pending start, false otherwise.
+		 */
+		bool isSequenceRunning() const
+		{
+			return (m_currentStepIndex != noStepIdx) || m_startSequenceRequest;
+		}
 
         virtual ~Sequence() = default;
 
 	protected:
-		std::vector<Step> m_sequenceDef{}; // Values of the number and times during the sequence
+		// Values of the number and times during the sequence
+		std::vector<Step> m_sequenceDef{};
 		T m_idleValue{};
-		int m_currentStepIndex{noStepIdx}; // Current index of the step
-		int m_numberOfSteps{};			   // Total number of steps to be executed, will be used in derived classes
+		// Current index of the step
+		int m_currentStepIndex{noStepIdx};
+		// Total number of steps to be executed, will be used in derived classes
+		int m_numberOfSteps{};
 		bool m_startSequenceRequest{false};
 
+		// # Pure virtual member functions
 		// Switches to the step. Returns true if it was possible and false if the sequence is finished
 		bool switchToNextStep() = 0;
         // Returns true if current step is finished
@@ -71,6 +137,7 @@ namespace valueSequencer
 	};
 
 	// Template functions must be defined in header file since every TU needs to see the implementation to compile the required instance
+	
 	template <typename T, typename U>
 	const T &Sequence<T, U>::getValue() const
 	{
@@ -81,26 +148,24 @@ namespace valueSequencer
 	template <typename T, typename U>
 	const T &Sequence<T, U>::executeSequence()
 	{
-		// Check request to start the sequence
-		if (m_startSequenceRequest)
+		// Check sequence is running
+		if (m_currentStepIndex != noStepIdx)
+		{
+			// Sequence already running, ignore requests to start the sequence
+			m_startSequenceRequest = false;
+
+			// Advance, do it only if sequence is running for efficiency
+			stepAdvance();
+
+			// Check required number of scans have already happened
+			if (isCurrentStepFinished())
+			{
+				switchToNextStep();
+			}
+		}else if (m_startSequenceRequest) // Check request to start the sequence
 		{
 			m_startSequenceRequest = false;
 			switchToNextStep();
-		}
-		else
-		{
-			// Check sequence is running
-			if (m_currentStepIndex != noStepIdx)
-			{
-                // Advance, do it only if sequence is running for efficiency
-				stepAdvance();
-
-				// Check required number of scans have already happened
-				if (isCurrentStepFinished())
-				{
-					switchToNextStep();
-				}
-			}
 		}
 		return getValue();
 	}

@@ -2,42 +2,68 @@
 #define SCAN_VALUE_HPP
 
 #include "Sequence.hpp"
-#include <vector>
 #include <algorithm>
 
 namespace valueSequencer
 {
-	// Generates a value that changes based on how many times a particular function is called
-	template <typename T> // T represents the type of the value to be changed
+	/**
+	 * @brief Generates a value that changes based on the number of times a function is called.
+	 *
+	 * This class derives from Sequence and advances its value according
+	 * to how many “scan” steps (function calls) have been executed.
+	 *
+	 * @tparam T Type of the value to be modified during the sequence.
+	 */
+	template <typename T>
 	class ScanValue : public Sequence<T, long>
 	{
 	public:
-		// Inherit constructor from base class
-		using Sequence<T,long>::Sequence;
+		/**
+		 * @brief Inherit constructors from the base Sequence class.
+		 *
+		 * No additional initialization is required.
+		 */
+		using Sequence<T, long>::Sequence;
 
 	protected:
+		/// Number of scans already performed in the current step.
 		long m_numOfScansAlreadyDone{};
-		// Switches to the step. Returns true if it was possible and false if the sequence is finished
+
+		/**
+		 * @brief Advances the sequence to the next step.
+		 *
+		 * @return True if the step was successfully advanced, false otherwise.
+		 */
 		bool switchToNextStep();
-        // Returns true if current step is finished
-        bool isCurrentStepFinished();
-        // Contains stuff to do to advance the step towards its length
-        void stepAdvance();
+
+		/**
+		 * @brief Checks if the current step has finished based on scan count.
+		 *
+		 * @return True if the current step is complete, false otherwise.
+		 */
+		bool isCurrentStepFinished();
+
+		/**
+		 * @brief Performs a single advance of the sequence based on scan count.
+		 *
+		 * Updates internal state and increments `m_numOfScansAlreadyDone`.
+		 */
+		void stepAdvance();
 	};
 
 	template <typename T>
 	bool ScanValue<T>::switchToNextStep()
 	{
-		// Switch to a step that is next to current one AND has at least one associated scan
 		m_numOfScansAlreadyDone = 0;
-
+		// Search for a step that is next and has at leas one associated scan
 		// Start searching from next element
 		auto begin = m_sequenceDef.begin() + static_cast<std::size_t>(this->m_currentStepIndex + 1);
 		// One after the end
 		auto end = m_sequenceDef.begin() + static_cast<std::size_t>(this->m_numberOfSteps);		   
 
+		// Look for a step that has at least one scan
 		auto it = std::find_if(begin, end, [](const ScanValue<T>::StepPar &step)
-							   { return step.numberOfScans > 0; }); // Look for a step that has at least one scan
+							   { return step.numberOfScans > 0; });
 
 		if (it == end)
 		{

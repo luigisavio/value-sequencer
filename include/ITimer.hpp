@@ -1,36 +1,80 @@
 #ifndef I_TIMER_HPP
 #define I_TIMER_HPP
 
-/* Interface to timer, abstract class */
-
 namespace timer
 {
-    // Always store time in milliseconds. Use long for better performance (32 bits guaranteed, long long has 64 and may 
-    // be not optimal for 32 bits CPUs). Use unsigned to double the range to about 50 days. On 64 bits CPUs let this be
-    // 64 bits. It may be more efficient and it can then count longer time intervals.
+    /**
+     * @brief Time type stored in milliseconds.
+     *
+     * Use `unsigned long` for better performance on 32-bit CPUs.
+     * Using unsigned doubles the maximum range (~50 days).
+     * On 64-bit CPUs this will typically be 64-bit, allowing longer intervals efficiently.
+     */
     using time_ms = unsigned long;
 
+    /**
+     * @brief Interface for a generic timer.
+     *
+     * Provides standard timer operations including preset time, elapsed
+     * time, input/output handling, and cycle-based advancement.
+     */
     class ITimer
     {
     public:
-        // Virtual destructor to force child classes to implement a destructor
+        /**
+         * @brief Virtual destructor.
+         *
+         * Ensures derived classes implement proper cleanup.
+         */
         virtual ~ITimer() = default;
 
-        // Preset time is the time that is associated to the timer (PT)
-        virtual void setPresetTime(time_ms presetTime) = 0; // Preset time is the time that must elapse
+        /**
+         * @brief Sets the preset time (PT) of the timer.
+         *
+         * @param presetTime Time that must elapse for the timer to trigger.
+         */
+        virtual void setPresetTime(time_ms presetTime) = 0;
+
+        /**
+         * @brief Gets the currently configured preset time.
+         *
+         * @return The preset time in milliseconds.
+         */
         virtual time_ms getPresetTime() const = 0;
 
-        // Advance timer by one cycle
+        /**
+         * @brief Advances the timer by one cycle.
+         *
+         * Should be called at each iteration of the main loop or tick.
+         */
         virtual void tick() = 0;
 
-        // Get the timer output (Q)
-        virtual bool out() const = 0; // Returns true if timer output is active
+        /**
+         * @brief Returns the timer output (Q).
+         *
+         * @return True if the timer output is active, false otherwise.
+         */
+        virtual bool out() const = 0;
 
-        // Get how much time is currently elapsed (ET)
+        /**
+         * @brief Gets the elapsed time (ET) since the timer started.
+         *
+         * @return Elapsed time in milliseconds.
+         */
         virtual time_ms getElapsedTime() const = 0;
 
-        // Manage the timer input (IN)
+        /**
+         * @brief Sets the timer input (IN).
+         *
+         * @param in True to activate the timer input, false to deactivate.
+         */
         virtual void setIn(bool in) = 0;
+
+        /**
+         * @brief Gets the current timer input state.
+         *
+         * @return True if the timer input is active, false otherwise.
+         */
         virtual bool getIn() const = 0;
     };
 }
