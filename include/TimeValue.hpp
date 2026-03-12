@@ -55,8 +55,8 @@ namespace valueSequencer
 	bool TimeValue<T>::switchToNextStep()
 	{
 		// Reset timer
-		stepTimer.setIn(false);
-        stepTimer.tick();
+		this->m_timer.setIn(false);
+        this->m_timer.tick();
 
         this->m_currentStepIndex += 1;
 
@@ -68,8 +68,8 @@ namespace valueSequencer
         }else
         {
 			// Preset and start the timer
-            stepTimer.setPresetTime(m_sequenceDef[this->m_currentStepIndex]);
-            stepTimer.setIn(true);
+            this->m_timer.setPresetTime(this->m_sequenceDef[this->m_currentStepIndex]);
+            this->m_timer.setIn(true);
 		    return true;
         }
 	}
@@ -78,15 +78,15 @@ namespace valueSequencer
 	bool TimeValue<T>::isCurrentStepFinished()
 	{
 		// Current step is finished if timer has finished counting
-		return stepTimer.out();
+		return this->m_timer.out();
 	}
 
 	template <typename T>
 	void TimeValue<T>::stepAdvance()
 	{
-		stepTimer.tick();
+		this->m_timer.tick();
 	}
-	
+
 } // namespace valueSequencer
 
 #endif // TIME_VALUE_HPP

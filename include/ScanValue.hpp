@@ -57,13 +57,13 @@ namespace valueSequencer
 		m_numOfScansAlreadyDone = 0;
 		// Search for a step that is next and has at leas one associated scan
 		// Start searching from next element
-		auto begin = m_sequenceDef.begin() + static_cast<std::size_t>(this->m_currentStepIndex + 1);
+		auto begin = this->m_sequenceDef.begin() + static_cast<std::size_t>(this->m_currentStepIndex + 1);
 		// One after the end
-		auto end = m_sequenceDef.begin() + static_cast<std::size_t>(this->m_numberOfSteps);		   
+		auto end = this->m_sequenceDef.begin() + static_cast<std::size_t>(this->m_numberOfSteps);		   
 
 		// Look for a step that has at least one scan
-		auto it = std::find_if(begin, end, [](const ScanValue<T>::StepPar &step)
-							   { return step.numberOfScans > 0; });
+		auto it = std::find_if(begin, end, [](const Sequence<T, long>::Step &step)
+							   { return step.length > 0; });
 
 		if (it == end)
 		{
@@ -71,20 +71,21 @@ namespace valueSequencer
 			return false;
 		}
 
-		this->m_currentStepIndex = static_cast<int>(std::distance(m_sequenceDef.begin(), it));
+		this->m_currentStepIndex = static_cast<int>(std::distance(this->m_sequenceDef.begin(), it));
 		return true;
 	}
 
 	template <typename T>
 	bool ScanValue<T>::isCurrentStepFinished()
 	{
-		return m_numOfScansAlreadyDone >= m_sequenceDef[static_cast<std::size_t>(this->m_currentStepIndex)].length;
+		return this->m_numOfScansAlreadyDone >= 
+		this->m_sequenceDef[static_cast<std::size_t>(this->m_currentStepIndex)].length;
 	}
 
 	template <typename T>
 	void ScanValue<T>::stepAdvance()
 	{
-		++m_numOfScansAlreadyDone;
+		++this->m_numOfScansAlreadyDone;
 	}
 
 } // namespace sequence

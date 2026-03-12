@@ -81,15 +81,6 @@ namespace valueSequencer
 		const T& executeSequence();
 
 		/**
-		 * @brief Resets the sequence state.
-		 *
-		 * Restores the object to the same state as after default construction.
-		 *
-		 * @return Reference to the current object.
-		 */
-		Sequence& reset();
-
-		/**
 		 * @brief Requests the start of the sequence.
 		 *
 		 * The sequence will start on the next execution cycle.
@@ -129,15 +120,15 @@ namespace valueSequencer
 
 		// # Pure virtual member functions
 		// Switches to the step. Returns true if it was possible and false if the sequence is finished
-		bool switchToNextStep() = 0;
+		virtual bool switchToNextStep() = 0;
         // Returns true if current step is finished
-        bool isCurrentStepFinished() = 0;
+        virtual bool isCurrentStepFinished() = 0;
         // Contains stuff to do to advance the step towards its length
-        void stepAdvance() = 0;
+        virtual void stepAdvance() = 0;
 	};
 
 	// Template functions must be defined in header file since every TU needs to see the implementation to compile the required instance
-	
+
 	template <typename T, typename U>
 	const T &Sequence<T, U>::getValue() const
 	{
@@ -173,7 +164,7 @@ namespace valueSequencer
 	template <typename T, typename U>
 	bool Sequence<T, U>::setSequence(std::vector<Step> sequenceDef,const T &idleValue)
 	{
-		reset();
+		m_currentStepIndex = noStepIdx;
         // Avoid expensive copy by using move semantics on std vector (move assignment operator)
 		m_sequenceDef = std::move(sequenceDef);
 		m_idleValue = idleValue;
@@ -181,14 +172,6 @@ namespace valueSequencer
 		m_numberOfSteps = static_cast<int>(m_sequenceDef.size());
 		return m_numberOfSteps != 0;
 	}
-
-	template <typename T, typename U>
-	Sequence<T, U> &Sequence<T, U>::reset()
-	{
-		*this = Sequence{};
-		return *this;
-	}
-
 } // namespace valueSequencer
 
 #endif // SCAN_VALUE_HPP
