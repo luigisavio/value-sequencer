@@ -5,7 +5,7 @@ MAKEFLAGS += -j4 # WARNING this flag enables multi thread compile. This only wor
 
 build: bin/final # produces executable file for the whole application, if not already produced
 
-bin/Tests.o: include/ScanValue.hpp include/TimeValue.hpp include/ITimer.hpp include/Sequence.hpp
+bin/Tests.o: include/ScanValue.hpp include/TimeValue.hpp include/ITimer.hpp include/Sequence.hpp tests/ScanValueTests.hpp tests/TimeValueTests.hpp tests/Tests.cpp
 	@echo "-> compiling Tests"
 	g++ -c tests/Tests.cpp -o bin/Tests.o $(COMPILER_FLAGS)
 

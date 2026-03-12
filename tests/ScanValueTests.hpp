@@ -10,7 +10,7 @@ void basicSequenceTest()
     using namespace valueSequencer;
 
     // Define a sequence: each Step = {value, duration_in_scans}
-    ScanValue<int> scanValue{{{1, 0}, {2, 1}, {0, 3}, {3, 4}}, 999}; // 4-step sequence with idle value
+    ScanValue<int> scanValue{{{1, 0}, {2, 1}, {0, 3}, {3, 4}}, 999}; // 4-values sequence with idle value
 
     // Initially, sequence has not started, so executeSequence returns idle value
     assert(scanValue.executeSequence() == 999);
@@ -21,15 +21,14 @@ void basicSequenceTest()
 
     // Execute sequence step by step
     // For ScanValue, value is repeated according to step duration (number of scans)
-    assert(scanValue.executeSequence() == 1); // Step 0
-    assert(scanValue.executeSequence() == 2); // Step 1 (first scan)
-    assert(scanValue.executeSequence() == 0); // Step 2 (first scan)
-    assert(scanValue.executeSequence() == 0); // Step 2 (second scan)
-    assert(scanValue.executeSequence() == 0); // Step 2 (third scan)
-    assert(scanValue.executeSequence() == 3); // Step 3 (first scan)
-    assert(scanValue.executeSequence() == 3); // Step 3 (second scan)
-    assert(scanValue.executeSequence() == 3); // Step 3 (third scan)
-    assert(scanValue.executeSequence() == 3); // Step 3 (fourth scan)
+    assert(scanValue.executeSequence() == 2);
+    assert(scanValue.executeSequence() == 0);
+    assert(scanValue.executeSequence() == 0);
+    assert(scanValue.executeSequence() == 0);
+    assert(scanValue.executeSequence() == 3);
+    assert(scanValue.executeSequence() == 3);
+    assert(scanValue.executeSequence() == 3);
+    assert(scanValue.executeSequence() == 3);
 
     // After finishing all steps, sequence returns idle value
     assert(scanValue.executeSequence() == 999);
