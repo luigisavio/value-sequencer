@@ -7,6 +7,15 @@
 namespace valueSequencer
 {
 	/**
+     * @brief Number of program scans.
+     *
+     * Use `unsigned long` for better performance on 32-bit CPUs.
+     * Using unsigned doubles the maximum range.
+     * On 64-bit CPUs this will typically be 64-bit, allowing longer intervals efficiently.
+     */
+    using scan_n = unsigned long;
+
+	/**
 	 * @brief Generates a value that changes based on the number of times a function is called.
 	 *
 	 * This class derives from Sequence and advances its value according
@@ -15,7 +24,7 @@ namespace valueSequencer
 	 * @tparam T Type of the value to be modified during the sequence.
 	 */
 	template <typename T>
-	class ScanValue : public Sequence<T, long>
+	class ScanValue : public Sequence<T, scan_n>
 	{
 	public:
 		/**
@@ -23,11 +32,11 @@ namespace valueSequencer
 		 *
 		 * No additional initialization is required.
 		 */
-		using Sequence<T, long>::Sequence;
+		using Sequence<T, scan_n>::Sequence;
 
 	protected:
 		/// Number of scans already performed in the current step.
-		long m_numOfScansAlreadyDone{};
+		scan_n m_numOfScansAlreadyDone{};
 
 		/**
 		 * @brief Advances the sequence to the next step.
@@ -62,7 +71,7 @@ namespace valueSequencer
 		auto end = this->m_sequenceDef.begin() + static_cast<std::size_t>(this->m_numberOfSteps);		   
 
 		// Look for a step that has at least one scan
-		auto it = std::find_if(begin, end, [](const Sequence<T, long>::Step &step)
+		auto it = std::find_if(begin, end, [](const Sequence<T, scan_n>::Step &step)
 							   { return step.length > 0; });
 
 		if (it == end)
