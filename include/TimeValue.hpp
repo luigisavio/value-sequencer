@@ -1,7 +1,7 @@
 #ifndef TIME_VALUE_HPP
 #define TIME_VALUE_HPP
 
-#include "ITimer.hpp"
+#include "ITimeDuration.hpp"
 #include "Sequence.hpp"
 
 namespace valueSequencer

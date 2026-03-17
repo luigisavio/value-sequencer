@@ -1,7 +1,7 @@
 #ifndef TON_TIMER_HPP
 #define TON_TIMER_HPP
 
-#include "ITimer.hpp"
+#include "ITimeDuration.hpp"
 #include <chrono>
 
 namespace timer
@@ -15,7 +15,7 @@ namespace timer
      * TON means that the timer output activates after configured preset time
      * is elapsed with timer input continuously active.
      */
-    class LightTonTimer : public ITimer
+    class LightTonTimer : public ITimeDuration
     {
     private:
         // Type aliases to make accessing nested type easier
