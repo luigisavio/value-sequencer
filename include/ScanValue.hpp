@@ -76,6 +76,7 @@ namespace valueSequencer
 
 		if (it == end)
 		{
+			// Exit, sequence is finished
 			this->m_currentStepIndex = this->noStepIdx;
 			return false;
 		}

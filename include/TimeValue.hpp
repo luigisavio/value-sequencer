@@ -23,11 +23,13 @@ namespace valueSequencer
 		 *
 		 * No additional initialization is required.
 		 */
-		using Sequence<T, timer::time_ms>::Sequence;
+		TimeValue(timer::ITimeDuration& timeDuration, std::vector<typename Sequence<T, timer::time_ms>::Step> sequenceDef, const T &idleValue = {})
+			: Sequence<T, timer::time_ms>(std::move(sequenceDef), idleValue), m_timeDuration{timeDuration}
+		{}
 
 	protected:
 		/// Timer used to track step durations.
-		timer::ITimeDuration m_timeDuration{};
+		timer::ITimeDuration& m_timeDuration;
 
 		/**
 		 * @brief Advances the sequence to the next step.
@@ -57,20 +59,23 @@ namespace valueSequencer
 		// Reset timer
 		this->m_timeDuration.reset();
 
-        this->m_currentStepIndex += 1;
+		// Search for a step that is next and has a time different from zero associated to it
+		auto begin = this->m_sequenceDef.begin() + static_cast<std::size_t>(this->m_currentStepIndex + 1);
+		// One after the end
+		auto end = this->m_sequenceDef.begin() + static_cast<std::size_t>(this->m_numberOfSteps);		   
 
-        if (this->m_currentStepIndex == this->m_numberOfSteps)
-        {
-            // Exit, sequence is finished
-            this->m_currentStepIndex = this->noStepIdx;
+		auto it = std::find_if(begin, end, [](const Sequence<T, timer::time_ms>::Step &step)
+							   { return step.length > static_cast<timer::time_ms>(0); });
+
+        if (it == end)
+		{
+			// Exit, sequence is finished
+			this->m_currentStepIndex = this->noStepIdx;
 			return false;
-        }else
-        {
-			// Preset and start the timer
-            this->m_timeDuration.setDuration(this->m_sequenceDef[this->m_currentStepIndex]);
-            this->m_timeDuration.start();
-		    return true;
-        }
+		}
+
+        this->m_currentStepIndex = static_cast<int>(std::distance(this->m_sequenceDef.begin(), it));
+		return true;
 	}
 
 	template <typename T>

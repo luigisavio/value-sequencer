@@ -3,8 +3,10 @@
 
 int main()
 {
-    basicSequenceTest();
-    moveHappensTest();
+    scanValueTests::basicSequenceTest();
+    scanValueTests::moveHappensTest();
+
+    timeValueTests::basicSequenceTest();
 
     std::cout << "All ScanValue tests passed.\n";
     return 0;

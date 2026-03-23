@@ -24,7 +24,7 @@ namespace timer
     public:
         void setDuration(time_ms duration) { m_duration = static_cast<time_ms>(duration); }
 
-        time_ms getDuration() { return static_cast<time_ms>(m_duration); }
+        time_ms getDuration() const { return static_cast<time_ms>(m_duration); }
 
         time_ms getElapsedTime() const
         {

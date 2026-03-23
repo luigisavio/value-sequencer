@@ -68,7 +68,7 @@ namespace timer
          *
          * It can then be used again by calling the start member function.
          */
-        virtual void reset() const = 0;
+        virtual void reset() = 0;
     };
 }
 
