@@ -74,6 +74,8 @@ namespace valueSequencer
 			return false;
 		}
 
+		this->m_timeDuration.start();
+
         this->m_currentStepIndex = static_cast<int>(std::distance(this->m_sequenceDef.begin(), it));
 		return true;
 	}
