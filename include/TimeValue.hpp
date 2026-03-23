@@ -1,7 +1,7 @@
 #ifndef TIME_VALUE_HPP
 #define TIME_VALUE_HPP
 
-#include "ITimer.hpp"
+#include "ITimeDuration.hpp"
 #include "Sequence.hpp"
 
 namespace valueSequencer
@@ -27,7 +27,7 @@ namespace valueSequencer
 
 	protected:
 		/// Timer used to track step durations.
-		timer::ITimer m_timer{};
+		timer::ITimeDuration m_timeDuration{};
 
 		/**
 		 * @brief Advances the sequence to the next step.
@@ -55,8 +55,7 @@ namespace valueSequencer
 	bool TimeValue<T>::switchToNextStep()
 	{
 		// Reset timer
-		this->m_timer.setIn(false);
-        this->m_timer.tick();
+		this->m_timeDuration.reset();
 
         this->m_currentStepIndex += 1;
 
@@ -68,8 +67,8 @@ namespace valueSequencer
         }else
         {
 			// Preset and start the timer
-            this->m_timer.setPresetTime(this->m_sequenceDef[this->m_currentStepIndex]);
-            this->m_timer.setIn(true);
+            this->m_timeDuration.setDuration(this->m_sequenceDef[this->m_currentStepIndex]);
+            this->m_timeDuration.start();
 		    return true;
         }
 	}
@@ -78,13 +77,13 @@ namespace valueSequencer
 	bool TimeValue<T>::isCurrentStepFinished()
 	{
 		// Current step is finished if timer has finished counting
-		return this->m_timer.out();
+		return this->m_timeDuration.isElapsed();
 	}
 
 	template <typename T>
 	void TimeValue<T>::stepAdvance()
 	{
-		this->m_timer.tick();
+		; // Do nothing, time duration does not need to be updated
 	}
 
 } // namespace valueSequencer
